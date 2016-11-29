@@ -1,16 +1,19 @@
 {
-  "name": "js-sandbox",
+  "name": "snap-collaboration",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node node_modules/mocha/bin/mocha --recursive test"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.0",
     "ws": "^1.1.1"
+  },
+  "devDependencies": {
+    "mocha": "^3.1.2"
   }
 }
