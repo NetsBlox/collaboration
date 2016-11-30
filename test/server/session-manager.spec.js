@@ -42,14 +42,14 @@ describe.only('SessionManager', function() {
 
             sessions.newSession(socket);
             actualId = Object.keys(sessions._sessions)[0];
-            sessionId = sessions.sessionId(socket);
+            sessionId = sessions.sessionId(socket.id);
             assert.equal(sessionId, actualId);
         });
 
         it('should not retrieve the session id after removed', function() {
             sessions.newSession(socket);
             sessions.remove(socket);
-            sessionId = sessions.sessionId(socket);
+            sessionId = sessions.sessionId(socket.id);
             assert(!sessionId);
         });
     });
@@ -78,7 +78,7 @@ describe.only('SessionManager', function() {
         });
 
         it('should not return session id', function() {
-            assert(!sessions.sessionId(socket));
+            assert(!sessions.sessionId(socket.id));
         });
     });
 
@@ -124,7 +124,7 @@ describe.only('SessionManager', function() {
         });
 
         it('should add socket to new session', function() {
-            assert.equal(sessionId, sessions.sessionId(socket));
+            assert.equal(sessionId, sessions.sessionId(socket.id));
         });
 
         it('should remove socket from old session', function() {

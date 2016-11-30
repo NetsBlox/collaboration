@@ -2,6 +2,8 @@ var SessionManager = function() {
     this.reset();
 };
 
+SessionManager.prototype.PROJECT_REQUEST = 'session-project-request';
+SessionManager.prototype.CURRENT_PROJECT = 'session-project';
 SessionManager.prototype.newSession = function(socket) {
     var sessionId = this._getNewSessionId();
 
@@ -12,8 +14,8 @@ SessionManager.prototype.newSession = function(socket) {
     return sessionId;
 };
 
-SessionManager.prototype.sessionId = function(socket) {
-    return this._sessionIdFor[socket.id];
+SessionManager.prototype.sessionId = function(socketId) {
+    return this._sessionIdFor[socketId];
 };
 
 SessionManager.prototype.joinSession = function(socketId, sessionId) {
@@ -34,7 +36,22 @@ SessionManager.prototype.joinSession = function(socketId, sessionId) {
     socket.isLeader = false;
 
     // Load the project for the given socket (from the leader)
-    // TODO
+    var leader = session.find(socket => socket.isLeader);
+    leader.send(JSON.stringify({
+        type: this.PROJECT_REQUEST,
+        target: socket.id,
+        sessionId: sessionId
+    }));
+};
+
+SessionManager.prototype.onReceivedSessionProject = function(msg) {
+    var socket = this._sockets[msg.target],
+        sessionId = this._sessionIdFor[msg.target];
+
+    if (socket && sessionId === msg.sessionId) {  // check if current; ow, ignore
+        msg.type = this.CURRENT_PROJECT;
+        socket.send(JSON.stringify(msg));
+    }
 };
 
 SessionManager.prototype.remove = function(socket) {
