@@ -52,20 +52,25 @@ var wss = new ws.Server({
 // Other sockets can then 
 wss.on('connection', socket => {
     socket.on('message', msg => {
-        console.log('received:', msg);
-        var sockets = sessions.getSession(socket);
-        if (!sockets) {
-            assert('session not found for', socket.id);
-        }
-
-        if (socket.isLeader) {
-            sockets
-                .filter(socket => socket.readyState === 1)  // is open
-                .filter(s => s !== socket)
-                .forEach(s => s.send(msg));
+        var json = JSON.parse(msg);
+        if (json.type === sessions.PROJECT_REQUEST) {
+            sessions.onReceivedSessionProject(json);
         } else {
-            var leader = sockets.find(socket => socket.isLeader);
-            leader.send(msg);
+            console.log('received:', msg);
+            var sockets = sessions.getSession(socket);
+            if (!sockets) {
+                assert('session not found for', socket.id);
+            }
+
+            if (socket.isLeader) {
+                sockets
+                    .filter(socket => socket.readyState === 1)  // is open
+                    .filter(s => s !== socket)
+                    .forEach(s => s.send(msg));
+            } else {
+                var leader = sockets.find(socket => socket.isLeader);
+                leader.send(msg);
+            }
         }
     });
 
