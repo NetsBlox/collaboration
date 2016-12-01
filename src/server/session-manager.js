@@ -34,6 +34,10 @@ SessionManager.prototype.joinSession = function(socketId, sessionId) {
     session.push(socket);
     this._sessionIdFor[socket.id] = sessionId;
     socket.isLeader = false;
+    socket.send(JSON.stringify({
+        type: 'session-id',
+        value: sessionId
+    }));
 
     // Load the project for the given socket (from the leader)
     var leader = session.find(socket => socket.isLeader);
@@ -60,7 +64,7 @@ SessionManager.prototype.remove = function(socket) {
         i;
 
     sessionId = this._sessionIdFor[socket.id];
-    sockets = this._sessions[sessionId];
+    sockets = this._sessions[sessionId] || [socket];
 
     if (sockets.length === 1) {
         delete this._sessions[sessionId];

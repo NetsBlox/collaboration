@@ -13,21 +13,6 @@ app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname, 'src', 'client', 'snap.html'));
 });
 
-app.get('/collaboration/session', function(req, res) {
-    var id = req.query.id,
-        sessionId;
-
-    // request the given sessionId
-    if (req.query.id) {
-        sessionId = sessions.sessionId(id);
-        if (!sessionId) {
-            return res.send('ERROR: Could not find session for ' + id);
-        }
-        return res.send(sessionId);
-    }
-    return res.status(400).send('ERROR: No socket id provided');
-});
-
 app.post('/collaboration/join', function(req, res) {
     var id = req.query.id,
         sessionId = req.query.sessionId;
@@ -86,7 +71,11 @@ wss.on('connection', socket => {
     }));
 
     // Add the socket to it's own session
-    sessions.newSession(socket);
+    var sessionId = sessions.newSession(socket);
+    socket.send(JSON.stringify({
+        type: 'session-id',
+        value: sessionId
+    }));
 
     rank++;
 });
