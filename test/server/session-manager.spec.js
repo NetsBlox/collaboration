@@ -138,8 +138,16 @@ describe.only('SessionManager', function() {
             assert.notEqual.apply(assert, session);
         });
 
-        it('send the socket the state of the project', function() {
-            // TODO
+        it('should send socket the new sessionId', function() {
+            var lastMsg = socket.message(-1);
+            assert.equal(lastMsg.type, 'session-id');
+            assert.equal(lastMsg.value, sessionId);
+        });
+
+        it('should request project from the leader', function() {
+            var lastMsg = s2.message(-1);
+            assert.equal(lastMsg.type, 'session-project-request');
+            assert.equal(lastMsg.target, socket.id);
         });
     });
 
@@ -148,5 +156,16 @@ describe.only('SessionManager', function() {
 function MockSocket(id) {
     this.id = id;
     this.readyState = 1;
-    this.send = () => {};
+    this._messages = [];
+};
+
+MockSocket.prototype.send = function(msg) {
+    this._messages.push(msg);
+};
+
+MockSocket.prototype.message = function(index) {
+    while (index < 0) {
+        index += this._messages.length;
+    }
+    return JSON.parse(this._messages[index]);
 };
