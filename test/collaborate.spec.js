@@ -1,6 +1,6 @@
 /*globals describe*/
 
-describe('Collaboration', function() {
+describe.skip('Collaboration', function() {
     var path = require('path'),
         assert = require('assert'),
         SnapUndo = require(path.join(__dirname, '..', 'src', 'client', 'undo')),
