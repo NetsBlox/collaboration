@@ -39,6 +39,11 @@ SessionManager.prototype.joinSession = function(socketId, sessionId) {
     session.push(socket);
     this._sessionIdFor[socket.id] = sessionId;
     socket.isLeader = false;
+    // demote old leader
+    socket.send(JSON.stringify({
+        type: 'leader-appoint',
+        value: false
+    }));
     socket.send(JSON.stringify({
         type: 'session-id',
         value: sessionId
@@ -109,7 +114,8 @@ var appointLeader = function(sockets) {
     if (leader) {
         leader.isLeader = true;
         leader.send(JSON.stringify({
-            type: 'leader-appoint'
+            type: 'leader-appoint',
+            value: true
         }));
     }
 };
