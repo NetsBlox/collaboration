@@ -124,6 +124,13 @@ describe.only('SessionManager', function() {
                 assert(s2.isLeader);
             });
 
+            it('should demote new socket', function() {
+                var msg = socket.messages().reverse()
+                    .find(msg => msg.type === 'leader-appoint');
+
+                assert.equal(msg.value, false);
+            });
+
             it('should add socket to new session', function() {
                 assert.equal(sessionId, sessions.sessionId(socket.id));
             });
@@ -185,4 +192,8 @@ MockSocket.prototype.message = function(index) {
         index += this._messages.length;
     }
     return JSON.parse(this._messages[index]);
+};
+
+MockSocket.prototype.messages = function() {
+    return this._messages.map(msg => JSON.parse(msg));
 };
