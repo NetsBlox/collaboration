@@ -104,50 +104,67 @@ describe.only('SessionManager', function() {
             oldSessionId,
             s2;
 
-        before(function() {
-            sessions.reset();
+        describe('existing session', function() {
+            before(function() {
+                sessions.reset();
 
-            s2 = new MockSocket('s2');
-            socket = new MockSocket('s1');
-            sessionId = sessions.newSession(s2);
-            oldSessionId = sessions.newSession(socket);
+                s2 = new MockSocket('s2');
+                socket = new MockSocket('s1');
+                sessionId = sessions.newSession(s2);
+                oldSessionId = sessions.newSession(socket);
 
-            sessions.joinSession(socket.id, sessionId);
+                sessions.joinSession(socket.id, sessionId);
+            });
+
+            it('should change socket to non-leader', function() {
+                assert(!socket.isLeader);
+            });
+
+            it('should set s2 to leader', function() {
+                assert(s2.isLeader);
+            });
+
+            it('should add socket to new session', function() {
+                assert.equal(sessionId, sessions.sessionId(socket.id));
+            });
+
+            it('should remove socket from old session', function() {
+                assert.equal(sessions._sessions[oldSessionId], undefined);
+            });
+
+            it('should have 2 unique sockets in session', function() {
+                var session = sessions.getSession(socket);
+
+                assert.equal(session.length, 2);
+                assert.notEqual.apply(assert, session);
+            });
+
+            it('should send socket the new sessionId', function() {
+                var lastMsg = socket.message(-1);
+                assert.equal(lastMsg.type, 'session-id');
+                assert.equal(lastMsg.value, sessionId);
+            });
+
+            it('should request project from the leader', function() {
+                var lastMsg = s2.message(-1);
+                assert.equal(lastMsg.type, 'session-project-request');
+                assert.equal(lastMsg.target, socket.id);
+            });
         });
 
-        it('should change socket to non-leader', function() {
-            assert(!socket.isLeader);
-        });
+        describe('non-existent session', function() {
+            before(function() {
+                sessions.reset();
 
-        it('should set s2 to leader', function() {
-            assert(s2.isLeader);
-        });
+                sessionId = 'someSession';
+                socket = new MockSocket('s1');
+                oldSessionId = sessions.newSession(socket);
+                sessions.joinSession(socket.id, sessionId);
+            });
 
-        it('should add socket to new session', function() {
-            assert.equal(sessionId, sessions.sessionId(socket.id));
-        });
-
-        it('should remove socket from old session', function() {
-            assert.equal(sessions._sessions[oldSessionId], undefined);
-        });
-
-        it('should have 2 unique sockets in session', function() {
-            var session = sessions.getSession(socket);
-
-            assert.equal(session.length, 2);
-            assert.notEqual.apply(assert, session);
-        });
-
-        it('should send socket the new sessionId', function() {
-            var lastMsg = socket.message(-1);
-            assert.equal(lastMsg.type, 'session-id');
-            assert.equal(lastMsg.value, sessionId);
-        });
-
-        it('should request project from the leader', function() {
-            var lastMsg = s2.message(-1);
-            assert.equal(lastMsg.type, 'session-project-request');
-            assert.equal(lastMsg.target, socket.id);
+            it('should create new session for socket', function() {
+                assert.equal(sessionId, sessions.sessionId(socket.id));
+            });
         });
     });
 

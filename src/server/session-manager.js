@@ -4,8 +4,8 @@ var SessionManager = function() {
 
 SessionManager.prototype.PROJECT_REQUEST = 'session-project-request';
 SessionManager.prototype.CURRENT_PROJECT = 'session-project';
-SessionManager.prototype.newSession = function(socket) {
-    var sessionId = this._getNewSessionId();
+SessionManager.prototype.newSession = function(socket, sessionId) {
+    sessionId = sessionId || this._getNewSessionId();
 
     this._sessions[sessionId] = [socket];
     this._sessionIdFor[socket.id] = sessionId;
@@ -25,6 +25,11 @@ SessionManager.prototype.joinSession = function(socketId, sessionId) {
     if (sessionId === this._sessionIdFor[socket.id]) {
         // nop - socket is already in the given session
         return;
+    }
+
+    // Create session if it doesn't exist
+    if (!session) {
+        return this.newSession(socket, sessionId);
     }
 
     // Remove the socket from the current session
