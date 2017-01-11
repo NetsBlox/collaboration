@@ -3,7 +3,7 @@ var SessionManager = function() {
 };
 
 SessionManager.prototype.PROJECT_REQUEST = 'session-project-request';
-SessionManager.prototype.CURRENT_PROJECT = 'session-project';
+SessionManager.prototype.CURRENT_PROJECT = 'openProject';
 SessionManager.prototype.newSession = function(socket, sessionId) {
     sessionId = sessionId || this._getNewSessionId();
 
