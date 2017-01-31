@@ -2,6 +2,8 @@
 [![Code Climate](https://codeclimate.com/github/NetsBlox/collaboration/badges/gpa.svg)](https://codeclimate.com/github/NetsBlox/collaboration)
 
 # Snap! collaboration server
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/NetsBlox/collaboration.svg)](https://greenkeeper.io/)
 Server support for the collaborative features of Snap!
 
 ## Quick start
