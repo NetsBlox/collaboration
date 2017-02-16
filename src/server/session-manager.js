@@ -1,3 +1,8 @@
+var logger = {
+    debug: console.log,
+    trace: console.log
+};
+
 var SessionManager = function() {
     this.reset();
 };
@@ -7,6 +12,7 @@ SessionManager.prototype.CURRENT_PROJECT = 'openProject';
 SessionManager.prototype.newSession = function(socket, sessionId) {
     sessionId = sessionId || this._getNewSessionId();
 
+    logger.trace(`Creating session ${sessionId} for ${socket.id}`);
     this._sessions[sessionId] = [socket];
     this._sessionIdFor[socket.id] = sessionId;
     this._sockets[socket.id] = socket;
@@ -22,6 +28,7 @@ SessionManager.prototype.joinSession = function(socketId, sessionId) {
     var socket = this._sockets[socketId],
         session = this._sessions[sessionId];
 
+    logger.trace(`${socketId} joining session ${sessionId}`);
     if (sessionId === this._sessionIdFor[socket.id]) {
         // nop - socket is already in the given session
         return;
@@ -132,9 +139,14 @@ SessionManager.prototype._printSockets = function(sessionId) {
 };
 
 SessionManager.prototype.reset = function() {
+    logger.debug('Resetting sessions!');
     this._sessions = {};
     this._sessionIdFor = {};
     this._sockets = {};
+};
+
+SessionManager.prototype.init = function(_logger) {
+    logger = _logger;
 };
 
 module.exports = new SessionManager();
