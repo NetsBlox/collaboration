@@ -86,6 +86,7 @@ module.exports = {
         });
 
     },
+    sessions: sessions,
     init: _logger => {
         logger = _logger;
         sessions.init(_logger.fork('sessions'));
