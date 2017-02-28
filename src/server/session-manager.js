@@ -85,12 +85,14 @@ SessionManager.prototype.remove = function(socket) {
 
     if (sockets.length === 1) {
         delete this._sessions[sessionId];
-    } else if (socket.isLeader) {
+    } else {
         i = sockets.indexOf(socket);
         sockets.splice(i, 1);
 
-        socket.isLeader = false;
-        appointLeader(sockets);
+        if (socket.isLeader) {
+            socket.isLeader = false;
+            appointLeader(sockets);
+        }
     }
     delete this._sessionIdFor[socket.id];
 };
