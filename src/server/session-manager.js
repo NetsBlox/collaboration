@@ -8,10 +8,12 @@ var SessionManager = function() {
 };
 
 SessionManager.prototype.PROJECT_REQUEST = 'session-project-request';
+SessionManager.prototype.NEW_SESSION = 'new-session';
 SessionManager.prototype.CURRENT_PROJECT = 'openProject';
 SessionManager.prototype.newSession = function(socket, sessionId) {
     sessionId = sessionId || this._getNewSessionId();
 
+    this.remove(socket);
     logger.trace(`Creating session ${sessionId} for ${socket.id}`);
     this._sessions[sessionId] = [socket];
     this._sessionIdFor[socket.id] = sessionId;
