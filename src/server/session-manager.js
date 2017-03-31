@@ -47,18 +47,11 @@ SessionManager.prototype.joinSession = function(socketId, sessionId) {
     // Remove the socket from the current session
     this.remove(socket);
 
-    // Notify sockets in the new session of the join
-    for (i = session.length; i--;) {
-        session[i].send(JSON.stringify({
-            type: 'collaborator-change',
-            value: 1
-        }));
-    }
     // Notify sockets in the old session of the leave
     for (i = oldSession.length; i--;) {
         oldSession[i].send(JSON.stringify({
-            type: 'collaborator-change',
-            value: -1
+            type: 'collaborator-count',
+            value: oldSession.length
         }));
     }
 
@@ -66,6 +59,15 @@ SessionManager.prototype.joinSession = function(socketId, sessionId) {
     session.push(socket);
     this._sessionIdFor[socket.id] = sessionId;
     socket.isLeader = false;
+
+    // Notify sockets in the new session of the join
+    for (i = session.length; i--;) {
+        session[i].send(JSON.stringify({
+            type: 'collaborator-count',
+            value: session.length
+        }));
+    }
+
     // demote old leader
     socket.send(JSON.stringify({
         type: 'leader-appoint',
