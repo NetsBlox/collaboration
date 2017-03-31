@@ -19,6 +19,10 @@ SessionManager.prototype.newSession = function(socket, sessionId) {
     this._sessionIdFor[socket.id] = sessionId;
     this._sockets[socket.id] = socket;
     appointLeader(this._sessions[sessionId]);
+    socket.send(JSON.stringify({
+        type: 'session-user-count',
+        value: 1
+    }));
     return sessionId;
 };
 
@@ -28,7 +32,10 @@ SessionManager.prototype.sessionId = function(socketId) {
 
 SessionManager.prototype.joinSession = function(socketId, sessionId) {
     var socket = this._sockets[socketId],
-        session = this._sessions[sessionId];
+        session = this._sessions[sessionId],
+        oldSessionId = this._sessionIdFor[socket.id],
+        oldSession = this._sessions[oldSessionId] || [],
+        i;
 
     logger.trace(`${socketId} joining session ${sessionId}`);
     if (sessionId === this._sessionIdFor[socket.id]) {
@@ -44,10 +51,27 @@ SessionManager.prototype.joinSession = function(socketId, sessionId) {
     // Remove the socket from the current session
     this.remove(socket);
 
+    // Notify sockets in the old session of the leave
+    for (i = oldSession.length; i--;) {
+        oldSession[i].send(JSON.stringify({
+            type: 'session-user-count',
+            value: oldSession.length
+        }));
+    }
+
     // Add the socket to the new session
     session.push(socket);
     this._sessionIdFor[socket.id] = sessionId;
     socket.isLeader = false;
+
+    // Notify sockets in the new session of the join
+    for (i = session.length; i--;) {
+        session[i].send(JSON.stringify({
+            type: 'session-user-count',
+            value: session.length
+        }));
+    }
+
     // demote old leader
     socket.send(JSON.stringify({
         type: 'leader-appoint',
