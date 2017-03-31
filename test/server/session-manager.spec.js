@@ -122,21 +122,21 @@ describe.only('SessionManager', function() {
 
             it('should notify s2 of new collaborator', function() {
                 var collabChange = s2.messages()
-                    .find(msg => msg.type === 'collaborator-count' && msg.value === 2);
+                    .find(msg => msg.type === 'session-user-count' && msg.value === 2);
 
                 assert(collabChange);
             });
 
             it('should notify s3 of collaborator exit', function() {
                 var collabChange = s3.messages()
-                    .find(msg => msg.type === 'collaborator-count' && msg.value === 1);
+                    .find(msg => msg.type === 'session-user-count' && msg.value === 1);
 
                 assert(collabChange);
             });
 
             it('should notify s1 of s2', function() {
                 var collabChange = socket.messages()
-                    .filter(msg => msg.type === 'collaborator-count' && msg.value === 2);
+                    .filter(msg => msg.type === 'session-user-count' && msg.value === 2);
 
                 assert.equal(collabChange.length, 2);
             });

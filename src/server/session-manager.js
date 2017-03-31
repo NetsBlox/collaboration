@@ -19,6 +19,10 @@ SessionManager.prototype.newSession = function(socket, sessionId) {
     this._sessionIdFor[socket.id] = sessionId;
     this._sockets[socket.id] = socket;
     appointLeader(this._sessions[sessionId]);
+    socket.send(JSON.stringify({
+        type: 'session-user-count',
+        value: 1
+    }));
     return sessionId;
 };
 
@@ -50,7 +54,7 @@ SessionManager.prototype.joinSession = function(socketId, sessionId) {
     // Notify sockets in the old session of the leave
     for (i = oldSession.length; i--;) {
         oldSession[i].send(JSON.stringify({
-            type: 'collaborator-count',
+            type: 'session-user-count',
             value: oldSession.length
         }));
     }
@@ -63,7 +67,7 @@ SessionManager.prototype.joinSession = function(socketId, sessionId) {
     // Notify sockets in the new session of the join
     for (i = session.length; i--;) {
         session[i].send(JSON.stringify({
-            type: 'collaborator-count',
+            type: 'session-user-count',
             value: session.length
         }));
     }
