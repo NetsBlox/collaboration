@@ -102,7 +102,39 @@ describe.only('SessionManager', function() {
     describe('join session', function() {
         var sessionId,
             oldSessionId,
-            s2;
+            s2,
+            s3;
+
+        describe('collab count notifications', function() {
+            before(function() {
+                sessions.reset();
+
+                s2 = new MockSocket('s2');
+                s3 = new MockSocket('s3');
+                socket = new MockSocket('s1');
+                sessionId = sessions.newSession(s2);
+                sessions.newSession(s3);
+                oldSessionId = sessions.newSession(socket);
+
+                sessions.joinSession(s3.id, oldSessionId);
+                sessions.joinSession(socket.id, sessionId);
+            });
+
+            it('should notify s2 of new collaborator', function() {
+                var collabChange = s2.messages()
+                    .find(msg => msg.type === 'collaborator-change' && msg.value === 1);
+
+                assert(collabChange);
+            });
+
+            it('should notify s3 of collaborator exit', function() {
+                var collabChange = s3.messages()
+                    .find(msg => msg.type === 'collaborator-change' && msg.value === -1);
+
+                assert(collabChange);
+            });
+
+        });
 
         describe('existing session', function() {
             before(function() {
