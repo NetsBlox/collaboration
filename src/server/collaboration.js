@@ -6,16 +6,19 @@ var assert = require('assert'),
         trace: console.log
     };
 
+var nop = () => {};
 sessions.init(logger);
 
 module.exports = {
     enable: function(app, wss, opts) {
         // Basically, when a socket connects, it is initially in it's own session.
         // Other sockets can then join/leave sessions
-        var msgFilter;
+        var msgFilter,
+            record;
 
         opts = opts || {};
         msgFilter = opts.msgFilter;
+        record = opts.record || nop;
         wss.on('connection', socket => {
             socket.on('message', msg => {
                 var json = JSON.parse(msg);
@@ -57,6 +60,8 @@ module.exports = {
                         leader.send(msg);
                     }
                 }
+                // Add a record event
+                record(json, sessions.getSessionId(socket));
             });
 
             socket.on('close', () => {
