@@ -54,6 +54,27 @@ describe.only('SessionManager', function() {
         });
     });
 
+    describe('getSessionId', function() {
+        beforeEach(init);
+
+        it('should retrieve the session id', function() {
+            var actualId,
+                sessionId;
+
+            sessions.newSession(socket);
+            actualId = Object.keys(sessions._sessions)[0];
+            sessionId = sessions.getSessionId(socket);
+            assert.equal(sessionId, actualId);
+        });
+
+        it('should not retrieve the session id after removed', function() {
+            sessions.newSession(socket);
+            sessions.remove(socket);
+            sessionId = sessions.getSessionId(socket);
+            assert(!sessionId);
+        });
+    });
+
     describe('remove', function() {
         var sessionId;
 

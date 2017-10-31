@@ -128,6 +128,11 @@ SessionManager.prototype.getSession = function(socket) {
     return this._sessions[sessionId] || null;
 };
 
+SessionManager.prototype.getSessionId = function(socket) {
+    var sessionId = this._sessionIdFor[socket.id];
+    return sessionId || null;
+};
+
 /////////////////////////// Private ///////////////////////////
 var rand = function(len) {
     return Math.floor(Math.random()*Math.pow(10, len)).toString();
