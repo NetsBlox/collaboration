@@ -1,5 +1,5 @@
 
-describe.only('SessionManager', function() {
+describe('SessionManager', function() {
     var sessions = require('../../src/server/session-manager'),
         assert = require('assert'),
         socket,

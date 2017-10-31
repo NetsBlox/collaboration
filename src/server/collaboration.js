@@ -91,6 +91,7 @@ module.exports = {
             var id = req.query.id,
                 sessionId = req.query.sessionId;
 
+            res.header('Access-Control-Allow-Origin', '*');
             console.log(`${id} is trying to join ${sessionId}`);
             // join the given collaboration session
             if (!id || !sessionId) {

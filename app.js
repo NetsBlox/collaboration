@@ -22,3 +22,8 @@ var wss = new ws.Server({
 
 // configure the websocket and app
 collaboration.enable(app, wss);
+
+module.exports = {
+    app: app,
+    wss: wss
+};
